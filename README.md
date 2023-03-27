@@ -4,6 +4,7 @@ Reproduction project for the methodology explained in the MonteFloor paper: http
 To work with the code:
 
 download the data: https://drive.google.com/file/d/1XpKm3vjvw4lOw32pX81w0U0YL_PBuzez/view
-and extract in the main folder
+and extract in the main folder.
+
 If using this data, make sure to cite the MonteFloor paper
 
