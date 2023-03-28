@@ -29,8 +29,8 @@ class MFLoader(object):
 
             self.data = DataLoader(self.dataset, self.batch_size,
                                    drop_last=True,
-                                   collate_fn=self.collate_fn,
-                                   shuffle=True)
+                                   shuffle=True,
+                                   collate_fn=self.collate_fn)
 
             self.sample_n = len(self.dataset)
 
@@ -72,24 +72,40 @@ class MFLoader(object):
             print('mode should be one of \'train, test, online_eval\'. Got {}'.format(mode))
 
     def collate_fn(self, samples):
+        # images = []
+        # masks = []
+        # boxes = []
+        # labels = []
 
-        # wall_maps = [torch.tensor(s["wall_map"][None,:,:,None], device=self.device) for s in samples]
-        room_maps = [torch.tensor(s["room_map"][None,:,:,None], device=self.device) for s in samples]
-        input_maps = [torch.tensor(s["input_map"][None], device=self.device) for s in samples]
-        scores = [torch.tensor(s["score"][None], device=self.device) for s in samples]
+        # for sample in samples:
+        #     images.append(sample[0])
+        #     boxes.append(sample[1]['boxes'])
+        #     masks.append(sample[1]['masks'])
+        #     labels.append(sample[1]['labels'])
+        
+        # images = [torch.as_tensor(i, dtype=torch.float32) for i in images]
+        # masks = [torch.as_tensor(m, dtype=torch.uint8) for m in masks]
+        # boxes = [torch.as_tensor(b, dtype=torch.float32) for b in boxes]
+        # labels = [torch.as_tensor(l, dtype=torch.int64) for l in labels]
+        
+        # target = {}
+        # target['masks'] = masks
+        # target['boxes'] = boxes
+        # target['labels'] = labels
 
-        torch_sample = {}
-        torch_sample["room_map"] = torch.cat(room_maps, dim=0)
-        # torch_sample["wall_map"] = torch.cat(wall_maps, dim=0)
-        torch_sample["input_map"] = torch.cat(input_maps, dim=0)
-        torch_sample["score"] = torch.cat(scores, dim=0)
+        images = []
+        targets = []
+        
+        for sample in samples:
+            images.append(torch.tensor(sample[0], dtype=torch.float32).view(1,256,256))
+            targets.append({
+                'boxes': torch.tensor(sample[1]['boxes'], dtype=torch.float32),
+                'labels': torch.tensor(sample[1]['labels'], dtype=torch.int64),
+                'masks': torch.tensor(sample[1]['masks'], dtype=torch.uint8),
+            })
+        
+        return images, targets
 
-
-        for key, value in torch_sample.items():
-            assert torch.all(torch_sample[key] == torch_sample[key])
-            assert torch.all(torch.logical_not(torch.isinf(torch_sample[key])))
-
-        return torch_sample
 
     def create_dataset(self, mode, generate_input_candidates):
         dataset_path = "montefloor_data"
