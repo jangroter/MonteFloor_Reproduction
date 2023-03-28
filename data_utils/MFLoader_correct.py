@@ -152,7 +152,7 @@ class S3DDataset(Dataset):
         self.scenes_list = os.listdir(scenes_path)
         self.scenes_list.sort()
 
-        inv_scenes = ["scene_01155", "scene_01852", "scene_01192", "scene_01816"]
+        inv_scenes = ["scene_00756","scene_01155", "scene_01852", "scene_01192", "scene_01816"]
         self.scenes_list = [s for s in self.scenes_list if s not in inv_scenes]
         self.scenes_list = self.scenes_list[:num_scenes]
 
@@ -167,7 +167,7 @@ class S3DDataset(Dataset):
         sample = self.load_scene(scene_name)
         image = sample['density_map']
 
-        target = self.get_target(sample)
+        target = self.get_target(sample, item)
 
 
         return image, target
@@ -175,14 +175,14 @@ class S3DDataset(Dataset):
     def __len__(self):
         return len(self.scenes_list)
     
-    def get_target(self,sample):
+    def get_target(self,sample, item):
         """
         Create target dictionary with 'boxes', 'labels', and 'masks'
         """
         
         labels = self.get_labels(sample)
         masks = self.get_masks(sample)
-        boxes = self.get_boxes(masks)
+        boxes = self.get_boxes(masks, item)
 
         target = {}
         target['boxes'] = boxes
@@ -208,8 +208,11 @@ class S3DDataset(Dataset):
 
         return binary_masks[1:]
 
-    def get_boxes(self, masks):
-        boxes = torchvision.ops.masks_to_boxes(masks)
+    def get_boxes(self, masks, item):
+        try:
+            boxes = torchvision.ops.masks_to_boxes(masks)
+        except:
+            print(item)
         return boxes
 
 
