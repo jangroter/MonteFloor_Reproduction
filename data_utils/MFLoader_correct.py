@@ -154,7 +154,7 @@ class S3DDataset(Dataset):
 
         inv_scenes = ["scene_00756","scene_01155", "scene_01852", "scene_01192", "scene_01816"]
         self.scenes_list = [s for s in self.scenes_list if s not in inv_scenes]
-        self.scenes_list = self.scenes_list[:num_scenes]
+        self.scenes_list = self.scenes_list[:(num_scenes-len(inv_scenes))]
 
 
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
