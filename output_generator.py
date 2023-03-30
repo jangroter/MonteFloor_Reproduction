@@ -5,8 +5,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import torchvision.models.detection as models
 
-train_data = mf.MFLoader(2,'train')
-image, target = train_data.dataset.__getitem__(3)
+score_cut_off = 0.9
+test_image = 923
+
+train_data = mf.MFLoader(1,'train')
+image, target = train_data.dataset.__getitem__(test_image)
 
 model = models.maskrcnn_resnet50_fpn()
 model.load_state_dict(torch.load('weights_maskrcnn'))
@@ -23,9 +26,12 @@ plt.figure()
 plt.subplot(121)
 plt.imshow(image*-1)
 plt.subplot(122)
-image2 = output[0]['masks'][0].view(256,256).detach().numpy() + output[0]['masks'][1].view(256,256).detach().numpy() + output[0]['masks'][3].view(256,256).detach().numpy() + output[0]['masks'][4].view(256,256).detach().numpy() + output[0]['masks'][5].view(256,256).detach().numpy()
-plt.imshow(image2)
+print(len(output[0]['labels']))
 
-# plt.imshow(sample["input_map"][:,:,1])
+masks = np.zeros_like(output[0]['masks'][0].view(256,256).detach().numpy())
+for i in range(len(output[0]['labels'])):
+    if output[0]['scores'][i] > score_cut_off:
+        masks += output[0]['masks'][i].view(256,256).detach().numpy()
 
+plt.imshow(masks)
 plt.show()

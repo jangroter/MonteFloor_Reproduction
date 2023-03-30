@@ -9,7 +9,6 @@ def ewma(prev,curr,beta=0.9):
    return beta*prev + (1-beta)*curr
 
 train_data = mf.MFLoader(1,'train')
-image, target = train_data.dataset.__getitem__(1)
 
 n_epochs = 50
 

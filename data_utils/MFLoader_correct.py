@@ -9,6 +9,14 @@ import json
 from data_utils.poly_utils import *
 from data_utils.s3d_utils import *
 
+def listdir_nohidden(path):
+    f = gen_nohidden(path)
+    return list(f)
+
+def gen_nohidden(path):
+    for f in os.listdir(path):
+        if not f.startswith('.'):
+            yield f
 
 class MFLoader(object):
     def __init__(self, batch_size, mode, generate_input_candidates=False):
@@ -149,8 +157,9 @@ class S3DDataset(Dataset):
         self.scenes_path = scenes_path
         self.floor_data_folder_name = ""
 
-        self.scenes_list = os.listdir(scenes_path)
+        self.scenes_list = listdir_nohidden(scenes_path)
         self.scenes_list.sort()
+        print(self.scenes_list[:5])
 
         inv_scenes = ["scene_00756","scene_01155", "scene_01852", "scene_01192", "scene_01816"]
         self.scenes_list = [s for s in self.scenes_list if s not in inv_scenes]
