@@ -1,22 +1,50 @@
 from torch.utils.data import DataLoader
 import torch
 import data_utils.MFLoader_correct as mf
-import numpy as np
 import matplotlib.pyplot as plt
 import torchvision.models.detection as models
+import numpy as np
+from PIL import Image
 
-score_cut_off = 0.9
-test_image = 923
+own_image = True
+image_path = 'house.png' #only used if own_image == True
+invert_image = True
 
-train_data = mf.MFLoader(1,'train')
-image, target = train_data.dataset.__getitem__(test_image)
+score_cut_off = 0.5
+
+if own_image:
+    # Load the image and resize it to 256x256
+    img = Image.open(image_path)
+    img = img.resize((256, 256))
+
+    # Convert the image to black and white
+    img = img.convert('L')
+
+    # Load the image into a NumPy array
+    arr = np.array(img)
+    arr = (arr - np.max(arr)) / np.max(arr)
+
+    if invert_image:
+        arr = (arr*-1)+1
+
+    image = arr
+
+    imaget = torch.tensor(arr, dtype=torch.float32).view(1,1,256,256)
+
+else:
+    test_image = 1
+
+    train_data = mf.MFLoader(1,'test')
+    image, target = train_data.dataset.__getitem__(test_image)
+    print(np.max(image))
+    
+    imaget = torch.tensor(image, dtype=torch.float32).view(1,1,256,256)
 
 model = models.maskrcnn_resnet50_fpn()
 model.load_state_dict(torch.load('weights_maskrcnn'))
 
 model.eval()
 
-imaget = torch.tensor(image, dtype=torch.float32).view(1,1,256,256)
 output = model(imaget)
 
 print(output)
