@@ -33,7 +33,7 @@ if own_image:
     imaget = torch.tensor(arr, dtype=torch.float32).view(1,1,256,256)
 
 else:
-    test_image = 1
+    test_image = 59
 
     train_data = mf.MFLoader(1,'test')
     image, target = train_data.dataset.__getitem__(test_image)
