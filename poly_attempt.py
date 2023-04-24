@@ -12,7 +12,8 @@ from descartes import PolygonPatch
 with open("out.pkl", "rb") as file:
     input = pickle.load(file)
 
-for i in range(1000):
+for i in range(16):
+# for i in range(np.shape(input[0]["masks"])[0]):
     try:
         output_mask = (
             input[0]["masks"][i, 0].detach().numpy()

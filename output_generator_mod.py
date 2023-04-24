@@ -7,7 +7,7 @@ import numpy as np
 from PIL import Image
 import pickle
 
-own_image = False
+own_image = True
 image_path = 'MonteFloor_Reproduction\house.png' #only used if own_image == True
 invert_image = True
 
@@ -33,7 +33,7 @@ if own_image:
     imaget = torch.tensor(arr, dtype=torch.float32).view(1,1,256,256)
 
 else:
-    test_image = 59
+    test_image = 4
 
     train_data = mf.MFLoader(1,'test')
     image, target = train_data.dataset.__getitem__(test_image)
